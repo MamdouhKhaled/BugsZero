@@ -8,25 +8,26 @@ class GameRunner
     public static function runGame()
     {
 
-        $aGame = new Game();
+        $playerOne = new Player('Chet');
+        $playerTwo = new Player('Pat');
+        $playerThree = new Player('Sue');
+        $aGame = new Game($playerOne, $playerTwo);
 
-        $aGame->add("Chet");
-        $aGame->add("Pat");
-        $aGame->add("Sue");
+
+        $aGame->add($playerThree);
 
 
         do {
-
+            $currentPlayer = $aGame->player;
             $aGame->roll(rand(0, 5) + 1);
-
             if (rand(0, 9) == 7) {
-                $notAWinner = $aGame->wrongAnswer();
+                $aGame->wrongAnswer();
             } else {
-                $notAWinner = $aGame->wasCorrectlyAnswered();
+                $aGame->wasCorrectlyAnswered();
             }
 
 
-        } while ($notAWinner);
+        } while (!$aGame->didPlayerWin($currentPlayer));
     }
 }
 
