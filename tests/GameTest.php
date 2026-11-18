@@ -6,6 +6,7 @@ namespace Tests;
 use App\Game;
 use App\GameRunner;
 use App\Player;
+use App\QuestionDeck;
 
 test("Lock Downr", function () {
     srand(123455);
@@ -23,7 +24,7 @@ test("Lock Downr", function () {
 it('A Game could have 7 players', function () {
     $playerOne = new Player('Chet');
     $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo);
+    $aGame = new Game($playerOne, $playerTwo,new QuestionDeck());
     foreach (range(1, 7) as $i) {
         $aGame->add(new Player("Player " . $i));
     }
@@ -32,7 +33,7 @@ it('A Game could have 7 players', function () {
 it('player will move with even step', function () {
     $playerOne = new Player('Chet');
     $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo);
+    $aGame = new Game($playerOne, $playerTwo,new QuestionDeck());
     $aGame->roll(4);
     expect(4)->toBe($playerOne->currentPlace());
 });
@@ -40,7 +41,7 @@ it('player will move with even step', function () {
 it('player will move with odd step while in Penalty Box', function () {
     $playerOne = new Player('Chet');
     $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo);
+    $aGame = new Game($playerOne, $playerTwo,new QuestionDeck());
     $playerOne->goToPenaltyBox();
     $aGame->roll(3);
     expect(3)->toBe($playerOne->currentPlace())
@@ -50,7 +51,7 @@ it('player will move with odd step while in Penalty Box', function () {
 it('player will move with odd step while in Penalty Box after correct answer', function () {
     $playerOne = new Player('Chet');
     $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo);
+    $aGame = new Game($playerOne, $playerTwo,new QuestionDeck());
     $playerOne->goToPenaltyBox();
     $aGame->roll(3);
     $aGame->wasCorrectlyAnswered();
@@ -61,7 +62,7 @@ it('player will move with odd step while in Penalty Box after correct answer', f
 it('player cannot move while in Penalty Box', function () {
     $playerOne = new Player('Chet');
     $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo);
+    $aGame = new Game($playerOne, $playerTwo,new QuestionDeck());
     $playerOne->goToPenaltyBox();
     $aGame->roll(2);
     expect(0)->toBe($playerOne->currentPlace());

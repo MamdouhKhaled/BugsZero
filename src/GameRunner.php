@@ -8,10 +8,11 @@ class GameRunner
     public static function runGame()
     {
 
+
         $playerOne = new Player('Chet');
         $playerTwo = new Player('Pat');
         $playerThree = new Player('Sue');
-        $aGame = new Game($playerOne, $playerTwo);
+        $aGame = new Game($playerOne, $playerTwo, new QuestionDeck());
 
 
         $aGame->add($playerThree);

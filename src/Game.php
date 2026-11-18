@@ -9,37 +9,17 @@ function echoln($string)
 class Game
 {
     private array $players = [];
-    var $popQuestions;
-    var $scienceQuestions;
-    var $sportsQuestions;
-    var $rockQuestions;
+
 
     var $currentPlayer = 0;
     public Player $player;
     var $isGettingOutOfPenaltyBox;
 
-    function __construct(Player $playerOne, Player $playerTwo)
+    function __construct(Player $playerOne, Player $playerTwo, private QuestionDeck $deck)
     {
-        $this->popQuestions = array();
-        $this->scienceQuestions = array();
-        $this->sportsQuestions = array();
-        $this->rockQuestions = array();
-
         $this->add($playerOne);
         $this->add($playerTwo);
-        for ($i = 0; $i < 50; $i++) {
-            array_push($this->popQuestions, "Pop Question " . $i);
-            array_push($this->scienceQuestions, ("Science Question " . $i));
-            array_push($this->sportsQuestions, ("Sports Question " . $i));
-            array_push($this->rockQuestions, $this->createRockQuestion($i));
-        }
     }
-
-    function createRockQuestion($index)
-    {
-        return "Rock Question " . $index;
-    }
-
     function add(Player $player)
     {
         if ($this->howManyPlayers() >= 6) {
@@ -80,33 +60,11 @@ class Game
         echoln($this->player->name
             . "'s new location is "
             . $this->player->currentPlace());
-        echoln("The category is " . $this->currentCategory());
-        $this->askQuestion();
+        echoln("The category is " . $this->deck->currentCategory($this->player->currentPlace()));
+        echoln($this->deck->askQuestion());
 
     }
 
-    function askQuestion()
-    {
-        if ($this->currentCategory() == "Pop")
-            echoln(array_shift($this->popQuestions));
-        if ($this->currentCategory() == "Science")
-            echoln(array_shift($this->scienceQuestions));
-        if ($this->currentCategory() == "Sports")
-            echoln(array_shift($this->sportsQuestions));
-        if ($this->currentCategory() == "Rock")
-            echoln(array_shift($this->rockQuestions));
-    }
-
-
-    function currentCategory()
-    {
-        return match ($this->player->currentPlace()) {
-            0, 4, 8 => "Pop",
-            1, 5, 9 => "Science",
-            2, 6, 10 => "Sports",
-            default => "Rock"
-        };
-    }
 
     function wasCorrectlyAnswered(): void
     {
