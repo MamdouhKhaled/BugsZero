@@ -25,7 +25,7 @@ class Player
         if ($place <= 0) {
             throw new \Exception('Invalid position');
         }
-        if ($place >= 6) {
+        if ($place > 6) {
             throw new \Exception('can\'t move forward more 6 at once');
         }
         $this->place = ($this->place + $place)%12;
