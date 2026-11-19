@@ -22,8 +22,12 @@ class QuestionDeck
 
     function askQuestion(): string
     {
+        if (empty($this->currentQuestionCategory)){
+            throw new \Exception("Question Category not set");
+        }
         $category = sprintf('%sQuestions', strtolower($this->currentQuestionCategory->value));
-        return array_shift($this->{$category});
+        $question = array_shift($this->{$category});
+        return $question ?? throw new \OutOfBoundsException("No questions left in {$category}");
     }
 
     function currentCategory(int $place):string

@@ -49,11 +49,13 @@ class Player
     public function gettingOutFromPenaltyBox(): void
     {
         $this->inPenalty = false;
+        $this->canLeavePenaltyBox = false;
     }
 
     public function goToPenaltyBox(): void
     {
         $this->inPenalty = true;
+        $this->canLeavePenaltyBox = false;
     }
 
     public function isEligibleToLeavePenaltyBox(): bool
@@ -63,6 +65,9 @@ class Player
 
     public function markAsEligibleToLeavePenaltyBox(): void
     {
+        if (!$this->inPenalty) {
+            throw new \LogicException('Player is not in the penalty box');
+        }
         $this->canLeavePenaltyBox = true;
     }
 

@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Adaptors\ConsoleOutputAdaptor;
+
 class GameRunner
 {
 
@@ -12,7 +14,7 @@ class GameRunner
         $playerOne = new Player('Chet');
         $playerTwo = new Player('Pat');
         $playerThree = new Player('Sue');
-        $aGame = new Game($playerOne, $playerTwo, new QuestionDeck());
+        $aGame = new Game($playerOne, $playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
 
 
         $aGame->add($playerThree);

@@ -1,37 +1,42 @@
 <?php
 
 namespace App;
-function echoln($string)
-{
-    echo $string . "\n";
-}
+
+use App\Enums\OutputEvent;
 
 class Game
 {
     private array $players = [];
 
-
     var $currentPlayer = 0;
     public Player $player;
     var $isGettingOutOfPenaltyBox;
 
-    function __construct(Player $playerOne, Player $playerTwo, private QuestionDeck $deck)
-    {
+    function __construct(
+        Player $playerOne,
+        Player $playerTwo,
+        private QuestionDeck $deck,
+        private Output $output
+    ) {
         $this->add($playerOne);
         $this->add($playerTwo);
     }
+
     function add(Player $player)
     {
         if ($this->howManyPlayers() >= 6) {
             throw new \Exception('A Game Cannot have more than six players');
         }
+
         if (empty($this->player)) {
             $this->player = $player;
         }
+
         array_push($this->players, $player);
 
-        echoln($player->name . " was added");
-        echoln("They are player number " . $this->howManyPlayers());
+        $this->output->message(OutputEvent::ADDED_PLAYER, $player->name);
+        $this->output->message(OutputEvent::PLAYER_NUMBER, $this->howManyPlayers());
+
         return true;
     }
 
@@ -42,71 +47,97 @@ class Game
 
     function roll($roll)
     {
-        $this->player->cannotLeavePenaltyBox();
-        echoln($this->player->name . " is the current player");
-        echoln("They have rolled a " . $roll);
+        $this->output->message(OutputEvent::CURRENT_PLAYER, $this->player->name);
+        $this->output->message(OutputEvent::ROLLED, $roll);
+
         if ($this->player->isInPenaltyBox() && $roll % 2 == 0) {
-            echoln($this->player->name . " is not getting out of the penalty box");
-            $this->isGettingOutOfPenaltyBox = false;
+            $this->output->message(
+                OutputEvent::CANNOT_GET_OUT_PENALTY_BOX,
+                $this->player->name
+            );
+
+            $this->player->cannotLeavePenaltyBox();
             return;
         }
 
         if ($this->player->isInPenaltyBox()) {
-            $this->isGettingOutOfPenaltyBox = true;
-//            $this->player->markAsEligibleToLeavePenaltyBox();
-            echoln($this->player->name . " is getting out of the penalty box");
+             $this->player->markAsEligibleToLeavePenaltyBox();
+
+            $this->output->message(
+                OutputEvent::LEAVE_PENALTY_BOX,
+                $this->player->name
+            );
         }
+
         $this->player->moveForwardBy($roll);
-        echoln($this->player->name
-            . "'s new location is "
-            . $this->player->currentPlace());
-        echoln("The category is " . $this->deck->currentCategory($this->player->currentPlace()));
-        echoln($this->deck->askQuestion());
 
+        $this->output->message(
+            OutputEvent::CHANGED_LOCATION,
+            $this->player->name,
+            $this->player->currentPlace()
+        );
+
+        $this->output->message(
+            OutputEvent::CATEGORY,
+            $this->deck->currentCategory($this->player->currentPlace())
+        );
+
+        $this->output->message(
+            OutputEvent::QUESTION,
+            $this->deck->askQuestion()
+        );
     }
-
 
     function wasCorrectlyAnswered(): void
     {
-        if ($this->player->isInPenaltyBox() && !$this->isGettingOutOfPenaltyBox) {
+        if ($this->player->isInPenaltyBox() && !$this->player->isEligibleToLeavePenaltyBox()) {
             $this->endTurn();
             return;
         }
-        if ($this->player->isInPenaltyBox()) {
-            echoln("Answer was correct!!!!");
-        } else {
-            echoln("Answer was corrent!!!!");
+        if ($this->player->isEligibleToLeavePenaltyBox()){
+            $this->player->gettingOutFromPenaltyBox();
         }
+        if ($this->player->isInPenaltyBox()) {
+            $this->output->message(OutputEvent::CORRECT_ANSWER);
+        } else {
+            $this->output->message(OutputEvent::CORRECT_ANSWER_WITH_TYPE_ERROR);
+        }
+
         $this->player->addOneCoin();
-        echoln($this->player->name
-            . " now has "
-            . $this->player->coins()
-            . " Gold Coins.");
+
+        $this->output->message(
+            OutputEvent::GOLD,
+            $this->player->name,
+            $this->player->coins()
+        );
 
         $this->endTurn();
     }
 
     function wrongAnswer()
     {
-        echoln("Question was incorrectly answered");
-        echoln($this->player->name . " was sent to the penalty box");
+        $this->output->message(OutputEvent::WRONG_ANSWER);
+
+        $this->output->message(
+            OutputEvent::GO_TO_PENALTY_BOX,
+            $this->player->name
+        );
+
         $this->player->goToPenaltyBox();
         $this->player->cannotLeavePenaltyBox();
+
         $this->endTurn();
     }
-
 
     function didPlayerWin(Player $player): bool
     {
         return $player->coins() >= 6;
     }
 
-    /**
-     * @return void
-     */
     public function endTurn(): void
     {
-        $this->currentPlayer = ++$this->currentPlayer % $this->howManyPlayers();
-        $this->player = $this->players[$this->currentPlayer];
+        $this->player = $this->players[
+        ++$this->currentPlayer % $this->howManyPlayers()
+        ];
     }
 }
