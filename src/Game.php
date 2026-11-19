@@ -8,16 +8,16 @@ class Game
 {
     private array $players = [];
 
-    var $currentPlayer = 0;
-    public Player $player;
-    var $isGettingOutOfPenaltyBox;
+    private int $currentPlayer = 0;
+    private Player $player;
 
     function __construct(
-        Player $playerOne,
-        Player $playerTwo,
+        Player               $playerOne,
+        Player               $playerTwo,
         private QuestionDeck $deck,
-        private Output $output
-    ) {
+        private Output       $output
+    )
+    {
         $this->add($playerOne);
         $this->add($playerTwo);
     }
@@ -61,7 +61,7 @@ class Game
         }
 
         if ($this->player->isInPenaltyBox()) {
-             $this->player->markAsEligibleToLeavePenaltyBox();
+            $this->player->markAsEligibleToLeavePenaltyBox();
 
             $this->output->message(
                 OutputEvent::LEAVE_PENALTY_BOX,
@@ -94,7 +94,7 @@ class Game
             $this->endTurn();
             return;
         }
-        if ($this->player->isEligibleToLeavePenaltyBox()){
+        if ($this->player->isEligibleToLeavePenaltyBox()) {
             $this->player->gettingOutFromPenaltyBox();
         }
         if ($this->player->isInPenaltyBox()) {
@@ -136,8 +136,6 @@ class Game
 
     public function endTurn(): void
     {
-        $this->player = $this->players[
-        ++$this->currentPlayer % $this->howManyPlayers()
-        ];
+        $this->player = $this->players[++$this->currentPlayer % $this->howManyPlayers()];
     }
 }
