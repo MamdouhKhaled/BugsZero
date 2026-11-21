@@ -10,6 +10,7 @@ class QuestionDeck
     private array $rockQuestions = [];
 
     private QuestionCategory $currentQuestionCategory;
+
     public function __construct()
     {
         for ($i = 0; $i < 50; $i++) {
@@ -22,7 +23,7 @@ class QuestionDeck
 
     function askQuestion(): string
     {
-        if (empty($this->currentQuestionCategory)){
+        if (empty($this->currentQuestionCategory)) {
             throw new \Exception("Question Category not set");
         }
         $category = sprintf('%sQuestions', strtolower($this->currentQuestionCategory->value));
@@ -30,7 +31,7 @@ class QuestionDeck
         return $question ?? throw new \OutOfBoundsException("No questions left in {$category}");
     }
 
-    function currentCategory(int $place):string
+    function currentCategory(int $place): string
     {
         $this->currentQuestionCategory = match ($place) {
             0, 4, 8 => QuestionCategory::POP,
@@ -39,5 +40,10 @@ class QuestionDeck
             default => QuestionCategory::ROCK,
         };
         return $this->currentQuestionCategory->value;
+    }
+
+    public function hasSelectedCategory(): bool
+    {
+        return !empty($this->currentQuestionCategory);
     }
 }

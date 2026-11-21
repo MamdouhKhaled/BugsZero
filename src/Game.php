@@ -90,6 +90,9 @@ class Game
 
     function wasCorrectlyAnswered(): void
     {
+        if (!$this->deck->hasSelectedCategory()){
+            throw new \Exception('must roll first');
+        }
         if ($this->player->isInPenaltyBox() && !$this->player->isEligibleToLeavePenaltyBox()) {
             $this->endTurn();
             return;
@@ -97,12 +100,8 @@ class Game
         if ($this->player->isEligibleToLeavePenaltyBox()) {
             $this->player->gettingOutFromPenaltyBox();
         }
-        if ($this->player->isInPenaltyBox()) {
-            $this->output->message(OutputEvent::CORRECT_ANSWER);
-        } else {
-            $this->output->message(OutputEvent::CORRECT_ANSWER_WITH_TYPE_ERROR);
-        }
 
+        $this->output->message(OutputEvent::CORRECT_ANSWER);
         $this->player->addOneCoin();
 
         $this->output->message(
@@ -116,6 +115,9 @@ class Game
 
     function wrongAnswer()
     {
+        if (!$this->deck->hasSelectedCategory()){
+            throw new \Exception('must roll first');
+        }
         $this->output->message(OutputEvent::WRONG_ANSWER);
 
         $this->output->message(

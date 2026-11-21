@@ -23,49 +23,51 @@ use App\QuestionDeck;
 //    $this->assertEquals($expected, $actual);
 //});
 
+beforeEach(function () {
+    $this->playerOne = new Player('Chet');
+    $this->playerTwo = new Player('Pat');
+    $this->aGame = new Game($this->playerOne, $this->playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
+
+});
+
 it('A Game could have 7 players', function () {
-    $playerOne = new Player('Chet');
-    $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
     foreach (range(1, 7) as $i) {
-        $aGame->add(new Player("Player " . $i));
+        $this->aGame->add(new Player("Player " . $i));
     }
 })->throws(\Exception::class);
 
 it('player will move with even step', function () {
-    $playerOne = new Player('Chet');
-    $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
-    $aGame->roll(4);
-    expect(4)->toBe($playerOne->currentPlace());
+    $this->aGame->roll(4);
+    expect(4)->toBe($this->playerOne->currentPlace());
 });
 
 it('player will move with odd step while in Penalty Box', function () {
-    $playerOne = new Player('Chet');
-    $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
-    $playerOne->goToPenaltyBox();
-    $aGame->roll(3);
-    expect(3)->toBe($playerOne->currentPlace())
-        ->and(true)->toBe($playerOne->isInPenaltyBox());
+    $this->playerOne->goToPenaltyBox();
+    $this->aGame->roll(3);
+    expect(3)->toBe($this->playerOne->currentPlace())
+        ->and(true)->toBe($this->playerOne->isInPenaltyBox());
 });
 
 it('player will move with odd step while in Penalty Box after correct answer', function () {
-    $playerOne = new Player('Chet');
-    $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
-    $playerOne->goToPenaltyBox();
-    $aGame->roll(3);
-    $aGame->wasCorrectlyAnswered();
-    expect(3)->toBe($playerOne->currentPlace())
-        ->and(false)->toBe($playerOne->isInPenaltyBox());
+    $this->playerOne->goToPenaltyBox();
+    $this->aGame->roll(3);
+    $this->aGame->wasCorrectlyAnswered();
+    expect(3)->toBe($this->playerOne->currentPlace())
+        ->and(false)->toBe($this->playerOne->isInPenaltyBox());
 });
 
 it('player cannot move while in Penalty Box', function () {
-    $playerOne = new Player('Chet');
-    $playerTwo = new Player('Pat');
-    $aGame = new Game($playerOne, $playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
-    $playerOne->goToPenaltyBox();
-    $aGame->roll(2);
-    expect(0)->toBe($playerOne->currentPlace());
+    $this->playerOne->goToPenaltyBox();
+    $this->aGame->roll(2);
+    expect(0)->toBe($this->playerOne->currentPlace());
+});
+
+describe('can not make answer without roll', function (){
+    it('correct answer', function () {
+        $this->aGame->wasCorrectlyAnswered();
+    })->throws(\Exception::class);
+
+    it('wrong answer', function () {
+        $this->aGame->wrongAnswer();
+    })->throws(\Exception::class);
 });

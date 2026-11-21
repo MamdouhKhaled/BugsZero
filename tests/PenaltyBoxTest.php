@@ -27,7 +27,6 @@ it('player in Penalty Box cannot move or earn a coin after even roll', function 
     $aGame = new Game($playerOne, $playerTwo, new QuestionDeck(), new Output(new ConsoleOutputAdaptor()));
     $playerOne->goToPenaltyBox();
     $aGame->roll(2);
-    $aGame->wasCorrectlyAnswered();
     expect(0)
         ->toBe($playerOne->currentPlace())
         ->and(true)->toBe($playerOne->isInPenaltyBox())
